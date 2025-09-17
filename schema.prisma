@@ -1,10 +1,105 @@
-generator client { provider = "prisma-client-js" }
-datasource db { provider = "sqlite"; url = env("DATABASE_URL") }
-enum Role { USER ORG CHARITY ADMIN }
-enum ItemStatus { AVAILABLE PENDING CLAIMED ARCHIVED }
-model User { id String @id @default(cuid()) email String @unique name String passwordHash String role Role @default(USER) credits Int @default(20) referralCode String @unique referredById String? referredBy User? @relation("Referral", fields: [referredById], references: [id]) referrals User[] @relation("Referral") items Item[] transactions CreditTransaction[] createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model Organization { id String @id @default(cuid()) name String @unique type Role subscriptionActive Boolean @default(false) creditBalance Int @default(0) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model Item { id String @id @default(cuid()) title String description String images String[] category String location String creditPrice Int @default(5) ownerId String owner User @relation(fields:[ownerId],references:[id]) claimerId String? claimer User? @relation("ClaimedBy", fields:[claimerId], references:[id]) status ItemStatus @default(AVAILABLE) pickupNeeded Boolean @default(false) createdAt DateTime @default(now()) updatedAt DateTime @updatedAt }
-model CreditTransaction { id String @id @default(cuid()) userId String user User @relation(fields:[userId], references:[id]) amount Int type String description String createdAt DateTime @default(now()) }
-model Donation { id String @id @default(cuid()) fromUserId String fromUser User @relation(fields:[fromUserId], references:[id]) toOrgId String toOrg Organization @relation(fields:[toOrgId], references:[id]) amount Int createdAt DateTime @default(now()) }
-model LogisticsRequest { id String @id @default(cuid()) itemId String item Item @relation(fields:[itemId], references:[id]) userId String user User @relation(fields:[userId], references:[id]) status String @default("REQUESTED") createdAt DateTime @default(now()) }
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ORG
+  CHARITY
+  ADMIN
+}
+
+enum ItemStatus {
+  AVAILABLE
+  PENDING
+  CLAIMED
+  ARCHIVED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(USER)
+  credits      Int      @default(20)
+  referralCode String   @unique
+  referredById String?
+  referredBy   User?    @relation("Referral", fields: [referredById], references: [id])
+  referrals    User[]   @relation("Referral")
+  items        Item[]
+  claimedItems Item[]   @relation("ClaimedBy")
+  transactions CreditTransaction[]
+  donations    Donation[]
+  logisticsRequests LogisticsRequest[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Organization {
+  id                 String     @id @default(cuid())
+  name               String     @unique
+  type               Role
+  subscriptionActive Boolean    @default(false)
+  creditBalance      Int        @default(0)
+  donations          Donation[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+}
+
+model Item {
+  id               String             @id @default(cuid())
+  title            String
+  description      String
+  images           String[]
+  category         String
+  location         String
+  creditPrice      Int                @default(5)
+  ownerId          String
+  owner            User               @relation(fields: [ownerId], references: [id])
+  claimerId        String?
+  claimer          User?              @relation("ClaimedBy", fields: [claimerId], references: [id])
+  status           ItemStatus         @default(AVAILABLE)
+  pickupNeeded     Boolean            @default(false)
+  logisticsRequests LogisticsRequest[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model CreditTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Int
+  type        String
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Donation {
+  id         String       @id @default(cuid())
+  fromUserId String
+  fromUser   User         @relation(fields: [fromUserId], references: [id])
+  toOrgId    String
+  toOrg      Organization @relation(fields: [toOrgId], references: [id])
+  amount     Int
+  createdAt  DateTime     @default(now())
+}
+
+model LogisticsRequest {
+  id        String   @id @default(cuid())
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  status    String   @default("REQUESTED")
+  createdAt DateTime @default(now())
+}
