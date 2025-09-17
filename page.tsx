@@ -1,0 +1,1 @@
+export default function Legal(){return(<div className='prose'><h1>תנאי שימוש</h1><p>הקרדיטים אינם כספיים.</p></div>)}
