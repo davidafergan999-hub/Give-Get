@@ -1,1 +1,0 @@
-export function formatCredits(n:number){return `${n} קרדיט${n===1?'':'ים'}`}
