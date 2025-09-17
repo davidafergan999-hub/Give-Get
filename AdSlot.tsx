@@ -1,0 +1,1 @@
+export default function AdSlot(){return(<div className='card'><div className='text-xs text-gray-500 mb-1'>חסות</div><div className='text-lg font-semibold'>מודעת קהילה</div><p className='text-sm text-gray-600'>מקום לפרסום אחראי.</p></div>)}
